@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Status — Aetherlyn Hosting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080c10;
+      --bg-card: #0d1117;
+      --bg-elevated: #161b22;
+      --border: #21262d;
+      --border-light: #30363d;
+      --text: #e6edf3;
+      --text-muted: #7d8590;
+      --text-dim: #484f58;
+      --green: #3fb950;
+      --green-glow: rgba(63, 185, 80, 0.15);
+      --yellow: #d29922;
+      --yellow-glow: rgba(210, 153, 34, 0.15);
+      --red: #f85149;
+      --red-glow: rgba(248, 81, 73, 0.15);
+      --blue: #388bfd;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(860px, 92vw);
+      margin-inline: auto;
+      padding: 3rem 0 5rem;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .brand__dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      flex-shrink: 0;
+    }
+
+    .brand__name {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .brand__name span {
+      color: var(--text);
+    }
+
+    .header__right {
+      text-align: right;
+    }
+
+    .header__title {
+      font-family: var(--mono);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+
+    .header__sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      font-family: var(--mono);
+    }
+
+    /* Overall status banner */
+    .banner {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      margin-bottom: 2rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .banner__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .banner.ok { border-color: var(--green); background: var(--green-glow); }
+    .banner.ok .banner__dot { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .banner.degraded { border-color: var(--yellow); background: var(--yellow-glow); }
+    .banner.degraded .banner__dot { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+    .banner.down { border-color: var(--red); background: var(--red-glow); }
+    .banner.down .banner__dot { background: var(--red); box-shadow: 0 0 6px var(--red); }
+
+    .banner__text { flex: 1; }
+    .banner__time { font-family: var(--mono); font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Section label */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.75rem;
+      margin-top: 2rem;
+    }
+
+    /* Service cards */
+    .services {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .service {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .service:last-child { border-bottom: none; }
+    .service:hover { background: var(--bg-elevated); }
+
+    .service__info {}
+
+    .service__name {
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.15rem;
+    }
+
+    .service__url {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .service__ping {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: right;
+      min-width: 60px;
+    }
+
+    .service__status {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      min-width: 80px;
+      justify-content: flex-end;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status--ok .status-dot { background: var(--green); box-shadow: 0 0 5px var(--green); }
+    .status--ok .status-text { color: var(--green); }
+    .status--degraded .status-dot { background: var(--yellow); box-shadow: 0 0 5px var(--yellow); }
+    .status--degraded .status-text { color: var(--yellow); }
+    .status--down .status-dot { background: var(--red); box-shadow: 0 0 5px var(--red); }
+    .status--down .status-text { color: var(--red); }
+    .status--checking .status-dot { background: var(--text-dim); animation: pulse 1s infinite; }
+    .status--checking .status-text { color: var(--text-dim); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Footer */
+    .foot {
+      margin-top: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .foot__copy {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .foot__back {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .foot__back:hover { color: var(--blue); }
+
+    /* Refresh indicator */
+    .refresh-bar {
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+
+    .refresh-bar__fill {
+      height: 100%;
+      background: var(--blue);
+      border-radius: 2px;
+      width: 100%;
+      transform-origin: left;
+      animation: refill 30s linear infinite;
+    }
+
+    @keyframes refill {
+      from { transform: scaleX(1); }
+      to { transform: scaleX(0); }
+    }
+
+    @media (max-width: 600px) {
+      .service { grid-template-columns: 1fr auto; }
+      .service__ping { display: none; }
+      .header { flex-direction: column; }
+      .header__right { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <a href="https://aetherlyn.lol" class="brand">
+      <div class="brand__dot" id="brandDot"></div>
+      <span class="brand__name"><span>Aetherlyn</span> Hosting</span>
+    </a>
+    <div class="header__right">
+      <h1 class="header__title">System Status</h1>
+      <p class="header__sub" id="lastChecked">Checking services…</p>
+    </div>
+  </div>
+
+  <div class="refresh-bar"><div class="refresh-bar__fill"></div></div>
+
+  <div class="banner checking" id="banner">
+    <div class="banner__dot"></div>
+    <span class="banner__text">Checking all systems…</span>
+    <span class="banner__time" id="bannerTime"></span>
+  </div>
+
+  <p class="section-label">Website</p>
+  <div class="services" id="group-web"></div>
+
+  <p class="section-label">Panel</p>
+  <div class="services" id="group-panel"></div>
+
+  <p class="section-label">Game Nodes</p>
+  <div class="services" id="group-nodes"></div>
+
+  <div class="foot">
+    <span class="foot__copy">&copy; 2026 Aetherlyn Hosting — auto-refreshes every 30s</span>
+    <a href="https://aetherlyn.lol" class="foot__back">← back to main site</a>
+  </div>
+
+</div>
+
+<script>
+const SERVICES = [
+  { id: 'web-main',   group: 'web',   name: 'Main Website',    url: 'https://www.aetherlyn.lol',              display: 'aetherlyn.lol' },
+  { id: 'panel',      group: 'panel', name: 'Control Panel',   url: 'https://dash.aetherlyn.lol',         display: 'dash.aetherlyn.lol' },
+  { id: 'node1',      group: 'nodes', name: 'Node 1',          url: 'https://node.aetherlyn.lol:8080',    display: 'node.aetherlyn.lol:8080' },
+];
+
+// We use a CORS proxy because browsers can't directly ping arbitrary HTTPS endpoints.
+// allorigins.win is a lightweight open proxy that just fetches the URL head.
+const PROXY = 'https://api.allorigins.win/get?url=';
+
+function buildCard(svc) {
+  const wrap = document.getElementById('group-' + svc.group);
+  const div = document.createElement('div');
+  div.className = 'service';
+  div.id = 'svc-' + svc.id;
+  div.innerHTML = `
+    <div class="service__info">
+      <div class="service__name">${svc.name}</div>
+      <div class="service__url">${svc.display}</div>
+    </div>
+    <div class="service__ping" id="ping-${svc.id}">—</div>
+    <div class="service__status status--checking" id="stat-${svc.id}">
+      <div class="status-dot"></div>
+      <span class="status-text">checking</span>
+    </div>`;
+  wrap.appendChild(div);
+}
+
+async function checkService(svc) {
+  const statEl = document.getElementById('stat-' + svc.id);
+  const pingEl = document.getElementById('ping-' + svc.id);
+  const start = Date.now();
+  try {
+    const res = await fetch(PROXY + encodeURIComponent(svc.url), {
+      signal: AbortSignal.timeout(12000)
+    });
+    const ms = Date.now() - start;
+    const data = await res.json();
+    // allorigins returns status in contents or status field
+    const ok = res.ok && data.status && data.status.http_code < 500;
+    const degraded = ms > 4000;
+    if (ok && !degraded) {
+      setStatus(statEl, 'ok', 'online');
+    } else if (ok && degraded) {
+      setStatus(statEl, 'degraded', 'slow');
+    } else {
+      setStatus(statEl, 'down', 'error');
+    }
+    pingEl.textContent = ms + 'ms';
+    return ok ? (degraded ? 'degraded' : 'ok') : 'down';
+  } catch {
+    const ms = Date.now() - start;
+    setStatus(statEl, 'down', 'offline');
+    pingEl.textContent = ms + 'ms';
+    return 'down';
+  }
+}
+
+function setStatus(el, state, label) {
+  el.className = 'service__status status--' + state;
+  el.querySelector('.status-text').textContent = label;
+}
+
+async function checkAll() {
+  document.getElementById('lastChecked').textContent = 'Checking… ' + new Date().toLocaleTimeString();
+  const results = await Promise.all(SERVICES.map(checkService));
+  const hasDown = results.includes('down');
+  const hasDegraded = results.includes('degraded');
+  const banner = document.getElementById('banner');
+  const dot = document.getElementById('brandDot');
+  const time = new Date().toLocaleTimeString();
+  document.getElementById('lastChecked').textContent = 'Last checked ' + time;
+  document.getElementById('bannerTime').textContent = time;
+  if (hasDown) {
+    banner.className = 'banner down';
+    banner.querySelector('.banner__text').textContent = 'One or more services are experiencing issues.';
+    dot.style.background = 'var(--red)';
+    dot.style.boxShadow = '0 0 8px var(--red)';
+  } else if (hasDegraded) {
+    banner.className = 'banner degraded';
+    banner.querySelector('.banner__text').textContent = 'Some services are responding slowly.';
+    dot.style.background = 'var(--yellow)';
+    dot.style.boxShadow = '0 0 8px var(--yellow)';
+  } else {
+    banner.className = 'banner ok';
+    banner.querySelector('.banner__text').textContent = 'All systems operational.';
+    dot.style.background = 'var(--green)';
+    dot.style.boxShadow = '0 0 8px var(--green)';
+  }
+}
+
+// Build all cards first
+SERVICES.forEach(buildCard);
+// Initial check
+checkAll();
+// Re-check every 30s
+setInterval(checkAll, 30000);
+</script>
+</body>
+</html>
